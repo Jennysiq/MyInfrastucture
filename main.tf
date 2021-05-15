@@ -9,9 +9,19 @@ echo "DRASTE-MARDASTE"
 EOF
 }
 
+locals {
+  bucket_name = "s3-bucket-${random_pet.this.id}"
+}
+
 ##############DATA SOURCE VPC,Subnet,SG,AMI####################
 data "aws_vpc" "default" {
   default  = true
+}
+
+data "aws_canonical_user_id" "current" {}
+
+resource "random_pet" "this" {
+  length = 2
 }
 
 data "aws_subnet_ids" "all" {
@@ -69,5 +79,62 @@ module "ec2_with_t2_unlimited" {
   tags          = {
     Name        = "Myapp"
     Owner       = "Jennysiq"
+  }
+}
+
+resource "aws_iam_role" "this" {
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+data "aws_iam_policy_document" "bucket_policy" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.this.arn]
+    }
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${local.bucket_name}",
+    ]
+  }
+}
+
+module "s3_bucket" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  bucket        = local.bucket_name
+  acl           = "private"
+  force_destroy = true
+
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.bucket_policy.json
+
+  attach_deny_insecure_transport_policy = true
+
+  tags    = {
+    Name  = "Myapp"
+    Owner = "Jennysiq"
+  }
+
+  versioning = {
+    enabled = true
   }
 }
