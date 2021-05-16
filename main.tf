@@ -34,10 +34,10 @@ data "aws_ami" "amazon_linux" {
   owners = ["amazon"]
 
   filter {
-    name = "tag:Name"
+    name = "name"
 
     values = [
-      "WebServer",
+      "amzn-ami-hvm-*-x86_64-gp2",
     ]
   }
 
@@ -45,13 +45,9 @@ data "aws_ami" "amazon_linux" {
     name = "owner-alias"
 
     values = [
-      "Jennysiq",
+      "amazon",
     ]
   }
-}
-
-output "aws_instans_public_ip" {
-    value = data.aws_instances.webserver_instans.public_ips
 }
 
 module "security_group" {
