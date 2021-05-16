@@ -34,10 +34,10 @@ data "aws_ami" "amazon_linux" {
   owners = ["amazon"]
 
   filter {
-    name = "name"
+    name = "tag:Name"
 
     values = [
-      "amzn-ami-hvm-*-x86_64-gp2",
+      "WebServer",
     ]
   }
 
@@ -45,9 +45,13 @@ data "aws_ami" "amazon_linux" {
     name = "owner-alias"
 
     values = [
-      "amazon",
+      "Jennysiq",
     ]
   }
+}
+
+output "aws_instans_public_ip" {
+    value = data.aws_instances.webserver_instans.public_ips
 }
 
 module "security_group" {
@@ -64,6 +68,7 @@ module "security_group" {
 
   tags                = {
     Owner             = "Jennysiq"
+    Name              = "MyWebServer"
   }
 }
 
@@ -81,7 +86,7 @@ module "ec2_with_t2_unlimited" {
   associate_public_ip_address = true
   
   tags          = {
-    Name        = "Myapp_ec2"
+    Name        = "MyWebServer"
     Owner       = "Jennysiq"
   }
 }
