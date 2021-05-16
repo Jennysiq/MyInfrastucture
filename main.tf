@@ -54,13 +54,17 @@ module "security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "~> 4.0"
 
-  name        = "MySGFlask"
-  description = "Security group for my E2C flask APP"
-  vpc_id      = data.aws_vpc.default.id
+  name                = "MySGFlask"
+  description         = "Security group for my E2C flask APP"
+  vpc_id              = data.aws_vpc.default.id
 
   ingress_cidr_blocks = ["0.0.0.0/0"]
   ingress_rules       = ["http-80-tcp", "all-icmp"]
   egress_rules        = ["all-all"]
+
+  tags                = {
+    Owner             = "Jennysiq"
+  }
 }
 
 module "ec2_with_t2_unlimited" {
@@ -77,7 +81,7 @@ module "ec2_with_t2_unlimited" {
   associate_public_ip_address = true
   
   tags          = {
-    Name        = "Myapp"
+    Name        = "Myapp_ec2"
     Owner       = "Jennysiq"
   }
 }
