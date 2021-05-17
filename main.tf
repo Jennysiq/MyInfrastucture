@@ -28,16 +28,16 @@ data "aws_subnet_ids" "all" {
   vpc_id   = data.aws_vpc.default.id
 }
 
-data "aws_ami" "amazon_linux" {
+data "aws_ami" "ubuntu-20_04" {
   most_recent = true
 
-  owners = ["amazon"]
+  owners = ["${var.ubuntu_account_number}"]
 
   filter {
     name = "name"
 
     values = [
-      "amzn-ami-hvm-*-x86_64-gp2",
+      "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20210223",
     ]
   }
 
