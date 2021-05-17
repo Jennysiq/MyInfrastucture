@@ -9,9 +9,9 @@ echo "DRASTE-MARDASTE"
 EOF
 }
 
-locals {
-  bucket_name = "s3-bucket-${random_pet.this.id}"
-}
+#locals {
+#  bucket_name = "s3-bucket-${random_pet.this.id}"
+#}
 
 ##############DATA SOURCE VPC,Subnet,SG,AMI####################
 data "aws_vpc" "default" {
@@ -105,41 +105,41 @@ resource "aws_iam_role" "this" {
 EOF
 }
 
-data "aws_iam_policy_document" "bucket_policy" {
-  statement {
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.this.arn]
-    }
+#data "aws_iam_policy_document" "bucket_policy" {
+ # statement {
+#    principals {
+ #     type        = "AWS"
+#      identifiers = [aws_iam_role.this.arn]
+ #   }
 
-    actions = [
-      "s3:GetObject",
-    ]
+#    actions = [
+#      "s3:GetObject",
+#    ]
 
-    resources = [
-      "arn:aws:s3:::${local.bucket_name}",
-    ]
-  }
-}
+ #   resources = [
+  #    "arn:aws:s3:::${local.bucket_name}",
+ #   ]
+#  }
+#}
 
-module "s3_bucket" {
-  source = "terraform-aws-modules/s3-bucket/aws"
+#module "s3_bucket" {
+ # source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket        = local.bucket_name
-  acl           = "private"
-  force_destroy = true
+  #bucket        = local.bucket_name
+ # acl           = "private"
+ # force_destroy = true
 
-  attach_policy = true
-  policy        = data.aws_iam_policy_document.bucket_policy.json
+ # attach_policy = true
+ # policy        = data.aws_iam_policy_document.bucket_policy.json
 
-  attach_deny_insecure_transport_policy = true
+ # attach_deny_insecure_transport_policy = true
 
-  tags    = {
-    Name  = "Myapp"
-    Owner = "Jennysiq"
-  }
+ # tags    = {
+ #   Name  = "Myapp"
+ #   Owner = "Jennysiq"
+ # }
 
-  versioning = {
-    enabled = true
-  }
-}
+ # versioning = {
+  #  enabled = true
+ # }
+#}
