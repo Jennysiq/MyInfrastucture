@@ -87,7 +87,7 @@ module "ec2_with_t2_unlimited" {
   }
 }
   
-module "ec2_with_t2_unlimited" {
+module "ec2_with_t2_unlimited1" {
   source = "terraform-aws-modules/ec2-instance/aws"
   instance_count = 1
 
