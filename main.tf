@@ -28,7 +28,7 @@ data "aws_subnet_ids" "all" {
   vpc_id   = data.aws_vpc.default.id
 }
 
-data "aws_ami" "ubuntu" {
+data "aws_ami" "latest_ubuntu" {
   most_recent = true
 
   owners = ["${var.ubuntu_account_number}"]
@@ -37,17 +37,17 @@ data "aws_ami" "ubuntu" {
     name = "name"
 
     values = [
-      "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20210223",
+      "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*",
     ]
   }
 
-  filter {
-    name = "owner-alias"
+#  filter {
+#    name = "owner-alias"
 
-    values = [
-      "amazon",
-    ]
-  }
+#    values = [
+#      "amazon",
+#    ]
+#  }
 }
 
 module "security_group" {
@@ -73,7 +73,7 @@ module "ec2_with_t2_unlimited" {
   instance_count = 2
 
   name          = "myapp"
-  ami           = data.aws_ami.ubuntu.id
+  ami           = data.aws_ami.latest_ubuntu.id
   instance_type = "t2.micro"
   cpu_credits   = "unlimited"
   key_name      = "jenkins"
