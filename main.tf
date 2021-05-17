@@ -70,7 +70,7 @@ module "security_group" {
 
 module "ec2_with_t2_unlimited" {
   source = "terraform-aws-modules/ec2-instance/aws"
-  instance_count = 2
+  instance_count = 1
 
   name          = "myapp"
   ami           = data.aws_ami.latest_ubuntu.id
@@ -86,7 +86,25 @@ module "ec2_with_t2_unlimited" {
     Owner       = "Jennysiq"
   }
 }
+  
+module "ec2_with_t2_unlimited" {
+  source = "terraform-aws-modules/ec2-instance/aws"
+  instance_count = 1
 
+  name          = "myapp"
+  ami           = data.aws_ami.latest_ubuntu.id
+  instance_type = "t2.micro"
+  cpu_credits   = "unlimited"
+  key_name      = "jenkins"
+  subnet_id     = tolist(data.aws_subnet_ids.all.ids)[0]
+  vpc_security_group_ids      = [module.security_group.security_group_id]
+  associate_public_ip_address = true
+  
+  tags          = {
+    Name        = "MyWebServer4mon"
+    Owner       = "eugen"
+  }
+}
 resource "aws_iam_role" "this" {
   assume_role_policy = <<EOF
 {
