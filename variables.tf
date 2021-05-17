@@ -145,3 +145,7 @@ variable "cpu_credits" {
   type        = string
   default     = "standard"
 }
+
+variable "ubuntu_account_number" {
+  default = "099720109477"
+}
