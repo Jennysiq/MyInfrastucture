@@ -73,7 +73,7 @@ module "ec2_with_t2_unlimited" {
   instance_count = 2
 
   name          = "myapp"
-  ami           = data.aws_ami.amazon_linux.id
+  ami           = data.aws_ami.ubuntu-20_04.id
   instance_type = "t2.micro"
   cpu_credits   = "unlimited"
   key_name      = "jenkins"
