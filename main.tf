@@ -91,7 +91,7 @@ module "ec2_with_t2_unlimited" {
   source = "terraform-aws-modules/ec2-instance/aws"
   instance_count = 1
 
-  name          = "myapp"
+  name          = "myappmon"
   ami           = data.aws_ami.latest_ubuntu.id
   instance_type = "t2.micro"
   cpu_credits   = "unlimited"
