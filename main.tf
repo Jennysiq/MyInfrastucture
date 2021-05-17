@@ -28,7 +28,7 @@ data "aws_subnet_ids" "all" {
   vpc_id   = data.aws_vpc.default.id
 }
 
-data "aws_ami" "ubuntu-20_04" {
+data "aws_ami" "ubuntu" {
   most_recent = true
 
   owners = ["${var.ubuntu_account_number}"]
@@ -73,7 +73,7 @@ module "ec2_with_t2_unlimited" {
   instance_count = 2
 
   name          = "myapp"
-  ami           = data.aws_ami.ubuntu-20_04.id
+  ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
   cpu_credits   = "unlimited"
   key_name      = "jenkins"
