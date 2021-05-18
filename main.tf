@@ -122,49 +122,19 @@ resource "aws_iam_role" "this" {
 }
 EOF
 }
-
-module "database" {
-  source                 = "voquis/rds-enhanced-monitoring/aws"
-  version                = "0.0.1"
-  subnet_ids             = module.networking.subnets[*].id
-  publicly_accessible    = true
+###################CREATE RDS MYSQL AND CONNECT WITH CREATED EC2#####################
+resource "aws_db_instance" "flask_db" {
+  identifier             = "flask_db"
   instance_class         = "db.t2.micro"
-  vpc_security_group_ids = [aws_security_group.db.id]
+  allocated_storage      = 5
+  engine                 = "mysql"
+  engine_version         = "8.0.20"
+  username               = "jennysiq"
+  password               = var.db_password
+  db_subnet_group_name   = aws_db_subnet_group.education.name
+  vpc_security_group_ids = [aws_security_group.rds.id]
+  parameter_group_name   = aws_db_parameter_group.education.name
+  publicly_accessible    = true
+  skip_final_snapshot    = true
 }
-    
-module "ec2_role_db_connect" {
-  source         = "voquis/ec2-role-rds-db-connect/aws"
-  version        = "0.0.1"
-  db_resource_id = module.database.db_instance.resource_id
-}
-  
-  
-resource "aws_security_group" "ec2" {
-  vpc_id = module.networking.vpc.id
-  ingress {
-    description = "SSH from my IP"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["8.8.8.8/32"]
-  }
-}
-  
-resource "aws_network_interface" "this" {
-  subnet_id   = module.networking.subnets[0].id
-  security_groups = [aws_security_group.ec2.id]
-}  
-  
-resource "aws_instance" "web" {
-  ami                    = "ami-042e8287309f5df03"
-  instance_type          = "t2.micro"
-  iam_instance_profile   = module.ec2_role_db_connect.iam_instance_profile.id
-  key_name               = "jenkins"
-  
-  network_interface {
-    network_interface_id = aws_network_interface.this.id
-    device_index         = 0
-  }
-}
-  
   
