@@ -161,6 +161,3 @@ variable "ami_id" {
     default = "ami-0d1cd67c26f5fca19"
 }
 
-variable "instance_type" {
-  default = "t2.micro"
-}
