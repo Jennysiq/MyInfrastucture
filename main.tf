@@ -128,6 +128,7 @@ module "database" {
   version                = "0.0.1"
   subnet_ids             = module.networking.subnets[*].id
   publicly_accessible    = true
+  instance_class         = "db.t2.micro"
   vpc_security_group_ids = [module.security_group.security_group_id]
 }
     
@@ -143,10 +144,11 @@ resource "aws_network_interface" "this" {
 }  
   
 resource "aws_instance" "web" {
-  ami                    = "ami-0eb89db7593b5d434"
+  ami                    = "ami-042e8287309f5df03"
   instance_type          = "t2.micro"
   iam_instance_profile   = module.ec2_role_db_connect.iam_instance_profile.id
-  key_name               = "my-key"
+  key_name               = "jenkins"
+  
   network_interface {
     network_interface_id = aws_network_interface.this.id
     device_index         = 0
