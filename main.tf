@@ -129,13 +129,25 @@ module "database" {
   subnet_ids             = module.networking.subnets[*].id
   publicly_accessible    = true
   instance_class         = "db.t2.micro"
-  vpc_security_group_ids = [module.security_group.security_group_id]
+  vpc_security_group_ids = [aws_security_group.db.id]
 }
     
 module "ec2_role_db_connect" {
   source         = "voquis/ec2-role-rds-db-connect/aws"
   version        = "0.0.1"
   db_resource_id = module.database.db_instance.resource_id
+}
+  
+  
+resource "aws_security_group" "ec2" {
+  vpc_id = module.networking.vpc.id
+  ingress {
+    description = "SSH from my IP"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["8.8.8.8/32"]
+  }
 }
   
 resource "aws_network_interface" "this" {
