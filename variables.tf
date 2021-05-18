@@ -149,3 +149,8 @@ variable "cpu_credits" {
 variable "ubuntu_account_number" {
   default = "099720109477"
 }
+
+
+variable "aws_region" {
+    default = "us-east-1"
+}
