@@ -87,24 +87,24 @@ module "ec2_with_t2_unlimited" {
   }
 }
   
-module "ec2_with_t2_unlimited1" {
-  source = "terraform-aws-modules/ec2-instance/aws"
-  instance_count = 1
+# module "ec2_with_t2_unlimited1" {
+#  source = "terraform-aws-modules/ec2-instance/aws"
+#  instance_count = 1
 
-  name          = "myappmon"
-  ami           = data.aws_ami.latest_ubuntu.id
-  instance_type = "t2.micro"
-  cpu_credits   = "unlimited"
-  key_name      = "jenkins"
-  subnet_id     = tolist(data.aws_subnet_ids.all.ids)[0]
-  vpc_security_group_ids      = [module.security_group.security_group_id]
-  associate_public_ip_address = true
+#  name          = "myappmon"
+#  ami           = data.aws_ami.latest_ubuntu.id
+#  instance_type = "t2.micro"
+#  cpu_credits   = "unlimited"
+#  key_name      = "jenkins"
+#  subnet_id     = tolist(data.aws_subnet_ids.all.ids)[0]
+#  vpc_security_group_ids      = [module.security_group.security_group_id]
+# associate_public_ip_address = true
   
-  tags          = {
-    Name        = "MyWebServer4mon"
-    Owner       = "eugen"
-  }
-}
+#  tags          = {
+#    Name        = "MyWebServer4mon"
+#    Owner       = "eugen"
+#  }
+#}
 resource "aws_iam_role" "this" {
   assume_role_policy = <<EOF
 {
@@ -123,41 +123,34 @@ resource "aws_iam_role" "this" {
 EOF
 }
 
-#data "aws_iam_policy_document" "bucket_policy" {
- # statement {
-#    principals {
- #     type        = "AWS"
-#      identifiers = [aws_iam_role.this.arn]
- #   }
-
-#    actions = [
-#      "s3:GetObject",
-#    ]
-
- #   resources = [
-  #    "arn:aws:s3:::${local.bucket_name}",
- #   ]
-#  }
-#}
-
-#module "s3_bucket" {
- # source = "terraform-aws-modules/s3-bucket/aws"
-
-  #bucket        = local.bucket_name
- # acl           = "private"
- # force_destroy = true
-
- # attach_policy = true
- # policy        = data.aws_iam_policy_document.bucket_policy.json
-
- # attach_deny_insecure_transport_policy = true
-
- # tags    = {
- #   Name  = "Myapp"
- #   Owner = "Jennysiq"
- # }
-
- # versioning = {
-  #  enabled = true
- # }
-#}
+module "database" {
+  source                 = "voquis/rds-enhanced-monitoring/aws"
+  version                = "0.0.1"
+  subnet_ids             = module.networking.subnets[*].id
+  publicly_accessible    = true
+  vpc_security_group_ids = [module.security_group.security_group_id]
+}
+    
+module "ec2_role_db_connect" {
+  source         = "voquis/ec2-role-rds-db-connect/aws"
+  version        = "0.0.1"
+  db_resource_id = module.database.db_instance.resource_id
+}
+  
+resource "aws_network_interface" "this" {
+  subnet_id   = module.networking.subnets[0].id
+  security_groups = [aws_security_group.ec2.id]
+}  
+  
+resource "aws_instance" "web" {
+  ami                    = "ami-0eb89db7593b5d434"
+  instance_type          = "t2.micro"
+  iam_instance_profile   = module.ec2_role_db_connect.iam_instance_profile.id
+  key_name               = "my-key"
+  network_interface {
+    network_interface_id = aws_network_interface.this.id
+    device_index         = 0
+  }
+}
+  
+  
